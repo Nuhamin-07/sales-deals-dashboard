@@ -1,4 +1,4 @@
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -10,7 +10,7 @@ function Header() {
   const handleSignOut = async () => {
     const { success, error } = await signOutUser();
     if (success) {
-      navigate("/");
+      navigate("/signin");
     } else {
       setError(error.message);
     }
