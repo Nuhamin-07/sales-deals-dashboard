@@ -11,12 +11,14 @@ const Signup = () => {
     async (previousState, formData) => {
       const email = formData.get("email");
       const password = formData.get("password");
+      const name = formData.get("name");
+      const accountType = formData.get("account-type");
 
       const {
         success,
         data,
         error: signUpError,
-      } = await signUpNewUser(email, password);
+      } = await signUpNewUser(email, password, name, accountType);
 
       if (signUpError) {
         return new Error(signUpError);
@@ -52,6 +54,20 @@ const Signup = () => {
             </Link>
           </p>
 
+          <label htmlFor="name">Name</label>
+          <input
+            className="form-input"
+            type="text"
+            name="name"
+            id="name"
+            placeholder=""
+            required
+            aria-required="true"
+            aria-invalid={error ? "true" : "false"}
+            aria-describedby={error ? "signup-error" : undefined}
+            disabled={isPending}
+          />
+
           <label htmlFor="email">Email</label>
           <input
             className="form-input"
@@ -79,6 +95,29 @@ const Signup = () => {
             aria-describedby={error ? "signup-error" : undefined}
             disabled={isPending}
           />
+
+          <fieldset
+            className="form-fieldset"
+            aria-required="true"
+            aria-label="Select your role"
+          >
+            <legend>Select your role</legend>
+            <div className="radio-group">
+              <label>
+                <input
+                  type="radio"
+                  name="account-type"
+                  value="admin"
+                  required
+                />{" "}
+                Admin
+              </label>
+              <label>
+                <input type="radio" name="account-type" value="rep" required />{" "}
+                Sales Rep
+              </label>
+            </div>
+          </fieldset>
 
           <button
             type="submit"

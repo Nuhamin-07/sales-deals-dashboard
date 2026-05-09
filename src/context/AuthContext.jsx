@@ -5,6 +5,7 @@ const AuthContext = createContext();
 
 export const AuthContextProvider = ({ children }) => {
   const [session, setSession] = useState(undefined);
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
     async function getInitialSession() {
@@ -29,6 +30,25 @@ export const AuthContextProvider = ({ children }) => {
       console.log("state changed ", session);
     });
   }, []);
+
+  useEffect(() => {
+    if (!session) return;
+    async function fetchUsers() {
+      try {
+        const { data, error } = await supabase
+          .from("user_profiles")
+          .select("id, name, account_type");
+        if (error) {
+          throw error;
+        }
+        console.log("Fetched users:", data);
+        setUsers(data);
+      } catch (error) {
+        console.error("Error fetching users:", error.message);
+      }
+    }
+    fetchUsers();
+  }, [session]);
 
   const signInUser = async (email, password) => {
     try {
@@ -59,11 +79,17 @@ export const AuthContextProvider = ({ children }) => {
     }
   };
 
-  const signUpNewUser = async (email, password) => {
+  const signUpNewUser = async (email, password, name, accountType) => {
     try {
       const { data, error } = await supabase.auth.signUp({
         email: email.toLowerCase(),
         password: password,
+        options: {
+          data: {
+            name: name,
+            account_type: accountType,
+          },
+        },
       });
       if (error) {
         console.error("Supabase sign-up error:", error.message);
@@ -82,7 +108,7 @@ export const AuthContextProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ session, signInUser, signOutUser, signUpNewUser }}
+      value={{ session, signInUser, signOutUser, signUpNewUser, users }}
     >
       {children}
     </AuthContext.Provider>
